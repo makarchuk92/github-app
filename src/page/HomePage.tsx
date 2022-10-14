@@ -5,13 +5,18 @@ import { useSearchUsersQuery } from '../redux/github/github.api'
 const HomePage = () => {
 
   const [search, setSearch] = useState('')
+  const [dropDown, setDropDown] = useState(false)
   const debounced = useDebounce(search)
 
-  useEffect(() => {
-    console.log(debounced)
-  }, [debounced])
+  const { isLoading, isError, data } = useSearchUsersQuery(debounced, {
+    skip: debounced.length < 3
+  })
 
-  const { isLoading, isError, data } = useSearchUsersQuery('makarchuk')
+  useEffect(() => {
+    setDropDown(debounced.length > 3 && data?.length! > 0)
+  }, [debounced, data])
+
+
 
 
   return (
@@ -25,9 +30,16 @@ const HomePage = () => {
           value={search}
           onChange={e => setSearch(e.target.value)}
         />
-        <div className='absolute top-[45px] left-0 right-0 max-h-[200px] shadow-md bg-white'>
-
-        </div>
+        {dropDown && <ul className='absolute top-[45px] left-0 right-0 max-h-[200px] overflow-x-scroll shadow-md bg-white'>
+          {isLoading && <p className='text-center'>Loading...</p>}
+          {data?.map(u => (
+            <li
+              className='py-2 px-4 hover:bg-slate-500 hover:text-white transition-colors cursor-pointer'
+              key={u.id}
+            >{u.login}
+            </li>
+          ))}
+        </ul>}
       </div>
     </div>
   )
