@@ -9,7 +9,8 @@ const HomePage = () => {
   const debounced = useDebounce(search)
 
   const { isLoading, isError, data } = useSearchUsersQuery(debounced, {
-    skip: debounced.length < 3
+    skip: debounced.length < 3,
+    refetchOnFocus: true
   })
 
   useEffect(() => {
@@ -41,7 +42,7 @@ const HomePage = () => {
           ))}
         </ul>}
       </div>
-    </div>
+    </div> 
   )
 }
 
