@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useDebounce } from '../hooks/useDebounce'
-import { useSearchUsersQuery } from '../redux/github/github.api'
+import { useLazyGetUserReposQuery, useSearchUsersQuery } from '../redux/github/github.api'
 
 const HomePage = () => {
 
@@ -12,6 +12,12 @@ const HomePage = () => {
     skip: debounced.length < 3,
     refetchOnFocus: true
   })
+
+  const [fetchRepos, {isLoading: reposLoading, data: reposData}] = useLazyGetUserReposQuery()
+
+  const clickHandler = (username: string) => {
+    fetchRepos(username)
+  }
 
   useEffect(() => {
     setDropDown(debounced.length > 3 && data?.length! > 0)
@@ -35,12 +41,16 @@ const HomePage = () => {
           {isLoading && <p className='text-center'>Loading...</p>}
           {data?.map(u => (
             <li
+            onClick={() => clickHandler(u.login)}
               className='py-2 px-4 hover:bg-slate-500 hover:text-white transition-colors cursor-pointer'
               key={u.id}
             >{u.login}
             </li>
           ))}
         </ul>}
+        <div>
+          {reposLoading && <p className='text-center'>Repos loading...</p>}
+        </div>
       </div>
     </div> 
   )
