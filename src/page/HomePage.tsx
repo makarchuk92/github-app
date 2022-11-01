@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { RepoCard } from '../components/RepoCard'
 import { useDebounce } from '../hooks/useDebounce'
 import { useLazyGetUserReposQuery, useSearchUsersQuery } from '../redux/github/github.api'
 
@@ -13,10 +14,11 @@ const HomePage = () => {
     refetchOnFocus: true
   })
 
-  const [fetchRepos, {isLoading: reposLoading, data: reposData}] = useLazyGetUserReposQuery()
+  const [fetchRepos, { isLoading: reposLoading, data: reposData }] = useLazyGetUserReposQuery()
 
   const clickHandler = (username: string) => {
     fetchRepos(username)
+    setDropDown(false)
   }
 
   useEffect(() => {
@@ -41,7 +43,7 @@ const HomePage = () => {
           {isLoading && <p className='text-center'>Loading...</p>}
           {data?.map(u => (
             <li
-            onClick={() => clickHandler(u.login)}
+              onClick={() => clickHandler(u.login)}
               className='py-2 px-4 hover:bg-slate-500 hover:text-white transition-colors cursor-pointer'
               key={u.id}
             >{u.login}
@@ -50,9 +52,10 @@ const HomePage = () => {
         </ul>}
         <div>
           {reposLoading && <p className='text-center'>Repos loading...</p>}
+          {reposData?.map(repo => <RepoCard repo={repo} key={repo.id} />)}
         </div>
       </div>
-    </div> 
+    </div>
   )
 }
 
